@@ -1,0 +1,25 @@
+---
+import { getEntry, getCollection } from 'astro:content';
+import ScratchLayout from '../../../../layouts/ScratchLayout.astro';
+import { url } from '../../../../lib/url';
+export async function getStaticPaths() {
+  const all = await getCollection('scratch-lesson-teacher');
+  return all.map((entry) => ({ params: { slug: entry.data.lesson }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const lesson = (await getEntry('scratch-lessons', d.lesson))!;
+const buttons = `<div class="bar"><a class="button" href="${url(lesson.data.starter)}" download>Αρχείο αρχής .sb3</a><a class="button secondary" href="${url(lesson.data.complete)}" download>Ολοκληρωμένη λύση .sb3</a></div>`;
+let html = entry.rendered?.html ?? '';
+const marker = /<\/section>(<section class="card"><h2[^>]*>Δομή μίας ώρας)/;
+html = marker.test(html) ? html.replace(marker, (_, next) => buttons + '</section>' + next) : html + buttons;
+---
+<ScratchLayout title={d.html_title} description={`Σημειώσεις εκπαιδευτή: ${d.title}`} teacher>
+  <a class="back" href={url(d.student_page)}>← Στο μάθημα</a>
+  <header class="hero">
+    <span class="badge">ΥΛΙΚΟ ΓΙΑ ΕΚΠΑΙΔΕΥΤΕΣ</span>
+    <p class="eyebrow">ΣΗΜΕΙΩΣΕΙΣ ΕΚΠΑΙΔΕΥΤΗ</p>
+    <h1>{d.title}</h1>
+  </header>
+  <div class="prose" set:html={html} />
+</ScratchLayout>

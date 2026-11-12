@@ -1,0 +1,55 @@
+---
+import { getEntry, getCollection, render } from 'astro:content';
+import ScratchLayout from '../../../layouts/ScratchLayout.astro';
+import GameCard from '../../../components/GameCard.astro';
+import { courseLessons } from '../../../lib/content';
+import { url } from '../../../lib/url';
+const page = (await getEntry('scratch-pages', 'course-index'))!;
+const d = page.data;
+const lessons = await courseLessons();
+const starters = (await getCollection('scratch-course-starters')).sort((a, b) => a.data.order - b.data.order);
+const games = (await getCollection('scratch-course-games')).sort((a, b) => a.data.order - b.data.order);
+const { Content } = await render(page);
+const section = (id: string) => d.sections!.find((s) => s.id === id)!;
+---
+<ScratchLayout title={d.html_title} description={d.intro}>
+  <a class="back" href={url(d.back.href)}>{d.back.label}</a>
+  <header class="hero">
+    <p class="eyebrow">{d.tag}</p>
+    <h1>{d.title}</h1>
+    <p class="lede">{d.intro}</p>
+    <div class="bar">
+      <a class="button big accent2" href={url(d.download_all.href)} download>{d.download_all.label}</a>
+      {d.pages?.map((p) => <a class="button secondary" href={url(p.href)}>{p.label}</a>)}
+    </div>
+  </header>
+
+  <h2 class="section-title">{section('lessons').heading} <span class="badge">Σημειώσεις εκπαιδευτή</span></h2>
+  <p>{section('lessons').intro}</p>
+  <div class="grid cards">
+    {lessons.map((l) => (
+      <a class={`card stripe lesson-card ${l.data.status === 'outline' ? 'outline' : ''}`} href={url(`/scratch-games/course/${l.data.slug}.html`)}>
+        <div class="body">
+          <span class="eyebrow">ΜΑΘΗΜΑ {l.data.number} · {l.data.status === 'full' ? 'ΠΛΗΡΕΙΣ ΣΗΜΕΙΩΣΕΙΣ' : 'ΠΕΡΙΓΡΑΜΜΑ'}</span>
+          <h3>{l.data.title}</h3>
+          <p class="concept">{l.data.goal}</p>
+          <span class="go">Άνοιγμα</span>
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <h2 class="section-title">{section('starters').heading}</h2>
+  <p>{section('starters').intro}</p>
+  <div class="grid cards">
+    {starters.map((s) => <GameCard title={s.data.title} description={s.data.description} downloads={[{ label: 'Λήψη .sb3', href: s.data.file }]} />)}
+  </div>
+
+  <h2 class="section-title">{section('games').heading}</h2>
+  <p>{section('games').intro}</p>
+  <div class="grid cards">
+    {games.map((g) => <GameCard title={g.data.title} description={g.data.description} image={g.data.screenshot} tags={g.data.concepts.join(' · ')} downloads={[{ label: 'Λήψη .sb3', href: g.data.file }]} />)}
+  </div>
+
+  <section class="panel prose"><Content /></section>
+</ScratchLayout>

@@ -1,0 +1,49 @@
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+/* micro:bit theme = Scratch base (scratch.css, loaded first) + LED/tech accent */
+:root {
+  --font-eyebrow: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --radius: 18px;
+  --bg: #eef3f6; --surface: #ffffff; --surface-2: #e3ebf0;
+  --text: #0f212b; --muted: #435663; --border: #c5d3db; --border-strong: #6c8190;
+  --accent: #b3122c; --accent-hover: #8f0e23; --on-accent: #ffffff; --link: #0b5a86; --focus: #b45309;
+  --eyebrow: #a10f27; --note: #0b5a86; --note-bg: #e3f0f7;
+  --led-off: #34444e; --led-on: #ff4d4d; --led-bg: #0f1c24;
+  --c1: #ff4d4d; --c2: #17b3a6; --c3: #f5b700; --c4: #4c8dff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1216; --surface: #131f26; --surface-2: #1b2b34;
+    --text: #e8f1f5; --muted: #a2b6c1; --border: #28404c; --border-strong: #6f8b9a;
+    --accent: #ff7a7a; --accent-hover: #ff9b9b; --on-accent: #1a0709; --link: #7cc4ee; --focus: #ffd24d;
+    --eyebrow: #ff9b9b; --note: #7cc4ee; --note-bg: #14303f;
+  }
+}
+body { background-image: radial-gradient(circle, color-mix(in srgb, var(--text) 9%, transparent) 1.5px, transparent 1.6px); background-size: 22px 22px; }
+.sitebar { background: #0b1820; border-bottom: 4px solid var(--c1); --text: #e8f1f5; --surface-2: #1b2b34; --accent: #ff7a7a; --on-accent: #1a0709; }
+.hero { border-color: var(--text); box-shadow: 8px 8px 0 var(--c1); }
+.hero .tag, .tag { font-family: var(--font-mono); letter-spacing: .06em; }
+.hero h1 { font-family: var(--font-body); font-weight: 800; }
+h1, h2, h3 { font-family: var(--font-body); }
+.mb-body > section { background: var(--surface); border: 3px solid var(--border); border-left: 12px solid var(--c1); border-radius: var(--radius); padding: clamp(1rem, 3vw, 1.8rem); margin: 0 0 1.4rem; }
+.mb-body > section:nth-of-type(3n+2) { border-left-color: var(--c2); }
+.mb-body > section:nth-of-type(3n+3) { border-left-color: var(--c4); }
+.mb-body > section > :last-child { margin-bottom: 0; }
+.is-teacher .mb-body > section { border-left-color: var(--teacher); }
+.mb-body .note { background: var(--note-bg); border-left: 5px solid var(--note); padding: .8rem 1.1rem; border-radius: 0 10px 10px 0; }
+.mb-body .tag { margin-bottom: .2rem; }
+.mb-body .tag::before { content: '● '; color: var(--led-on); }
+.patterns, .designer { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin: 1.2rem 0; }
+.patterns article { background: var(--surface-2); border-radius: 14px; padding: .2rem 1.3rem 1rem; }
+.mb-body pre, .designer pre { font: 1.3rem/1.6 var(--font-mono); white-space: pre-wrap; background: var(--led-bg); color: #ff9a9a; border-radius: 12px; padding: .9rem 1.1rem; margin: 0 0 1rem; overflow-x: auto; letter-spacing: .08em; }
+.led-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; background: var(--led-bg); padding: 20px; border-radius: 18px; max-width: 340px; border: 3px solid #3b505c; }
+.led-grid button { aspect-ratio: 1; min-width: 0; padding: 0; border: 2px solid #8396a0; border-radius: 50%; background: var(--led-off); cursor: pointer; margin: 0; min-height: 0; }
+.led-grid button[aria-pressed=true] { background: var(--led-on); box-shadow: 0 0 14px 2px #ff4d4d99; border-color: #ffc0c0; }
+.led-grid button:focus-visible { outline: 3px solid #ffd24d; outline-offset: 2px; }
+.controls { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.controls button, .mb-body button:not(.led-grid button) { font: inherit; font-weight: 700; min-height: 2.6rem; padding: .5rem 1rem; border-radius: 999px; background: var(--surface-2); color: var(--text); border: 2px solid var(--border-strong); cursor: pointer; }
+.controls button:hover { border-color: var(--accent); }
+.checklist label { display: flex; align-items: center; gap: .75rem; padding: .5rem 0; font-weight: 600; }
+#led-status { font-weight: 700; min-height: 1.6em; }
+@media (max-width: 650px) { .patterns, .designer { grid-template-columns: 1fr; } .led-grid { max-width: 100%; } }
+@media print { .controls, .led-grid { display: none; } .mb-body > section { border-left-width: 3px; } body { background-image: none; } }

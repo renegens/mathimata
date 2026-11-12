@@ -1,0 +1,22 @@
+---
+import { adultLessons } from '../lib/content';
+import { url } from '../lib/url';
+const { current, teacher = false } = Astro.props;
+const lessons = await adultLessons();
+const core = lessons.filter((l) => !l.data.optional);
+const extra = lessons.filter((l) => l.data.optional);
+const href = (l: (typeof lessons)[number]) => url(`/${l.data.slug}/`) + (teacher ? 'teacher-notes.html' : '');
+---
+<details class="lesson-list no-print">
+  <summary>Όλα τα μαθήματα ενηλίκων</summary>
+  <nav aria-label="Λίστα μαθημάτων">
+    <h2>Βασικός κύκλος</h2>
+    <ol>
+      {core.map((l) => <li><a href={href(l)} aria-current={l.data.slug === current ? 'page' : undefined}><span class="n">{l.data.number}</span><span>{l.data.title}</span></a></li>)}
+    </ol>
+    <h2>Επιπλέον επιλογές</h2>
+    <ol>
+      {extra.map((l) => <li><a href={href(l)} aria-current={l.data.slug === current ? 'page' : undefined}><span class="n">{l.data.number}</span><span>{l.data.title}</span></a></li>)}
+    </ol>
+  </nav>
+</details>

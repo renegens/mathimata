@@ -1,0 +1,17 @@
+---
+import { url } from '../lib/url';
+const { number, title, description, image, imageClass = '', downloads = [], tags } = Astro.props;
+---
+<article class="card stripe game-card">
+  {image && <img class={`shot ${imageClass}`} src={url(image)} alt="" loading="lazy" width="640" height="480" />}
+  <div class="body">
+    {number && <span class="num">{number}</span>}
+    <h3>{title}</h3>
+    <p>{description}</p>
+    {tags && <p class="tags">{tags}</p>}
+    <slot />
+    <div class="actions">
+      {downloads.map((d: any) => <a class={`button ${d.secondary ? 'secondary' : ''}`} href={url(d.href)} download={d.download === false ? undefined : true}>{d.label}</a>)}
+    </div>
+  </div>
+</article>

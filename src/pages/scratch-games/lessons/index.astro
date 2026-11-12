@@ -1,0 +1,38 @@
+---
+import { getEntry, render } from 'astro:content';
+import ScratchLayout from '../../../layouts/ScratchLayout.astro';
+import { scratchLessons } from '../../../lib/content';
+import { url } from '../../../lib/url';
+const page = (await getEntry('scratch-pages', 'lessons-index'))!;
+const d = page.data;
+const lessons = await scratchLessons();
+const { Content } = await render(page);
+const nn = (n: number) => String(n).padStart(2, '0');
+---
+<ScratchLayout title={d.html_title} description={d.intro}>
+  <a class="back" href={url(d.back.href)}>{d.back.label}</a>
+  <header class="hero">
+    <p class="eyebrow">{d.tag}</p>
+    <h1>{d.title}</h1>
+    <p class="lede">{d.intro}</p>
+    <div class="bar">
+      <a class="button big accent2" href={url(d.download_all.href)} download>{d.download_all.label}</a>
+      {d.teacher_notes && <a class="button secondary" href={url(d.teacher_notes.href)}>{d.teacher_notes.label}</a>}
+    </div>
+  </header>
+  <div class="grid cards">
+    {lessons.map((l) => (
+      <a class="card stripe lesson-card" href={url(`/scratch-games/lessons/${l.data.slug}/`)}>
+        <img class="shot" src={url(l.data.preview)} alt="" loading="lazy" width="640" height="360" />
+        <div class="body">
+          <span class="eyebrow">ΜΑΘΗΜΑ {nn(l.data.number)} · {l.data.minutes} ΛΕΠΤΑ</span>
+          <h2>{l.data.title}</h2>
+          <p class="concept">{l.data.concept}</p>
+          <p>{l.data.goal}</p>
+          <span class="go">Άνοιγμα μαθήματος →</span>
+        </div>
+      </a>
+    ))}
+  </div>
+  <section class="panel prose"><Content /></section>
+</ScratchLayout>

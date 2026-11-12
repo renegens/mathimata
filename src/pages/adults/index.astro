@@ -1,0 +1,38 @@
+---
+import AdultLayout from '../../layouts/AdultLayout.astro';
+import { adultLessons } from '../../lib/content';
+import { url } from '../../lib/url';
+const lessons = await adultLessons();
+const core = lessons.filter((l) => !l.data.optional);
+const extra = lessons.filter((l) => l.data.optional);
+---
+<AdultLayout title="Μαθήματα ενηλίκων" description="24 ωριαία μαθήματα για υπολογιστή, διαδίκτυο και εργασία." aside={false}>
+  <a class="back" href={url('/')}>← Βιβλιοθήκη</a>
+  <p class="eyebrow">ΜΑΘΑΙΝΟΥΜΕ ΒΗΜΑ ΒΗΜΑ</p>
+  <h1>Μαθήματα ενηλίκων</h1>
+  <p class="lede">Κάθε μάθημα διαρκεί 60 λεπτά. Διάλεξε θέμα από τα {core.length} βασικά και τις {extra.length} επιπλέον επιλογές.</p>
+  <div class="intro-actions">
+    <a class="button secondary" href={url('/adults/teacher-guide.html')}>Για εκπαιδευτές: πρόγραμμα 20 ωρών</a>
+    <a class="button secondary" href={url('/adult-materials/')}>Αρχεία εξάσκησης</a>
+  </div>
+  <div class="catalog">
+    {[{ title: 'Βασικός κύκλος', list: core }, { title: 'Επιπλέον επιλογές', list: extra }].map((g) => (
+      <section aria-labelledby={`g-${g.list[0].data.number}`}>
+        <h2 id={`g-${g.list[0].data.number}`}>{g.title}</h2>
+        <div class="grid">
+          {g.list.map((l) => (
+            <article class={`card lesson-card ${l.data.optional ? 'optional' : ''}`}>
+              <span class="type">{l.data.optional ? 'ΕΠΙΠΛΕΟΝ ΕΠΙΛΟΓΗ' : 'ΒΑΣΙΚΟΣ ΚΥΚΛΟΣ'} · {l.data.minutes} ΛΕΠΤΑ</span>
+              <h3><span>{l.data.number}.</span> {l.data.title}</h3>
+              <p>{l.data.goal}</p>
+              <div class="links">
+                <a href={url(`/${l.data.slug}/`)}>Για μαθητές →</a>
+                <a href={url(`/${l.data.slug}/teacher-notes.html`)}>Για εκπαιδευτές →</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</AdultLayout>

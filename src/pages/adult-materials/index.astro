@@ -1,0 +1,17 @@
+---
+import AdultLayout from '../../layouts/AdultLayout.astro';
+import { url } from '../../lib/url';
+const pdf = url('/adult-materials/programma-ergasias.pdf');
+---
+<AdultLayout title="Υλικό εξάσκησης" description="Ελληνικό δείγμα PDF για τα μαθήματα." aside={false}>
+  <nav class="tabs"><a href={url('/adults/')}>Μαθήματα ενηλίκων</a></nav>
+  <header class="lesson-head">
+    <h1>Υλικό εξάσκησης</h1>
+    <p class="goal">Ελληνικό δείγμα PDF για τα μαθήματα.</p>
+    <div class="bar">
+      <a class="button" href={pdf} download>Λήψη PDF</a>
+      <a class="button secondary" href={pdf} target="_blank" rel="noopener">Άνοιγμα PDF (νέα καρτέλα)</a>
+    </div>
+    <p><a href={url('/adult-materials/paketo-exaskisis.zip')} download>Λήψη πακέτου ZIP</a></p>
+  </header>
+</AdultLayout>

@@ -1,0 +1,20 @@
+---
+import { getEntry, render } from 'astro:content';
+import MicrobitLayout from '../../layouts/MicrobitLayout.astro';
+import { url } from '../../lib/url';
+const entry = (await getEntry('microbit', 'teacher-notes'))!;
+const d = entry.data;
+const { Content } = await render(entry);
+---
+<MicrobitLayout title={d.html_title} description={d.intro} teacher scripts={d.scripts}>
+  <nav class="bar no-print" aria-label="Πλοήγηση μαθήματος">
+    {d.nav.map((n) => <a class="back" href={url(n.href)}>{n.label}</a>)}
+  </nav>
+  <header class="hero">
+    <span class="badge">ΥΛΙΚΟ ΓΙΑ ΕΚΠΑΙΔΕΥΤΕΣ</span>
+    <p class="tag">{d.tag}</p>
+    <h1>{d.title}</h1>
+    <p class="lede">{d.intro}</p>
+  </header>
+  <div class="mb-body prose"><Content /></div>
+</MicrobitLayout>

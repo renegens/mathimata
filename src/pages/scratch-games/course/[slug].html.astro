@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content';
+import ScratchLayout from '../../../layouts/ScratchLayout.astro';
+import { courseLessons } from '../../../lib/content';
+import { url } from '../../../lib/url';
+export async function getStaticPaths() {
+  const lessons = await courseLessons();
+  const all = await getCollection('scratch-course');
+  return all.map((entry) => {
+    const i = lessons.findIndex((l) => l.id === entry.id);
+    return {
+      params: { slug: entry.data.slug },
+      props: { entry, prev: i > 0 ? lessons[i - 1] : undefined, next: i >= 0 ? lessons[i + 1] : undefined },
+    };
+  });
+}
+const { entry, prev, next } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const isLesson = d.kind === 'lesson';
+---
+<ScratchLayout title={d.html_title} description={d.kind === 'lesson' ? d.goal : d.title} teacher>
+  <a class="back" href={url('/scratch-games/course/')}>← Μαθήματα Scratch 7–9 ετών</a>
+  <header class="hero">
+    {d.kind === 'lesson' && <p class="eyebrow">ΜΑΘΗΜΑ {d.number} · {d.minutes} ΛΕΠΤΑ · {d.ages.replace('–', '–')} ΕΤΩΝ</p>}
+    <span class="badge">Σημειώσεις εκπαιδευτή</span>
+    <h1>{d.title}</h1>
+    <div class="bar">
+      {d.download && <a class="button secondary" href={url(d.download)} download>Λήψη .md</a>}
+      <button class="button secondary" type="button" data-print>Εκτύπωση</button>
+    </div>
+  </header>
+  <div class="prose course-body"><Content /></div>
+  {isLesson && (
+    <nav class="pager" aria-label="Σειρά μαθημάτων">
+      {prev ? <a class="prev" href={url(`/scratch-games/course/${prev.data.slug}.html`)}>← Μάθημα {prev.data.number}</a> : <span></span>}
+      {next && <a class="next" href={url(`/scratch-games/course/${next.data.slug}.html`)}>Μάθημα {next.data.number} →</a>}
+    </nav>
+  )}
+</ScratchLayout>

@@ -1,0 +1,40 @@
+---
+import { render } from 'astro:content';
+import AdultLayout from '../../layouts/AdultLayout.astro';
+import { adultLessons } from '../../lib/content';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const lessons = await adultLessons();
+  return lessons.map((entry, i) => ({
+    params: { lesson: entry.data.slug },
+    props: { entry, prev: lessons[i - 1], next: lessons[i + 1] },
+  }));
+}
+const { entry, prev, next } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const lessonUrl = (s: string) => url(`/${s}/`);
+---
+<AdultLayout title={d.title} description={d.goal} current={d.slug}>
+  <nav class="tabs" aria-label="Υλικό μαθήματος">
+    <strong aria-current="page">Για μαθητές</strong>
+    <a href={url(`/${d.slug}/teacher-notes.html`)}>Για εκπαιδευτές</a>
+    <a href={url('/adults/')}>Μαθήματα ενηλίκων</a>
+  </nav>
+  <header class="lesson-head">
+    <p class="eyebrow">{d.tag}</p>
+    <h1>{d.title}</h1>
+    <p class="goal">Στόχος: {d.goal}</p>
+    <div class="head-actions">
+      <button class="btn secondary screen" type="button" data-print>Εκτύπωση</button>
+      <p id="progress" class="status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="muted" style="margin:0">{d.intro}</p>
+  </header>
+  <div class="prose"><Content /></div>
+  <nav class="pager" aria-label="Σειρά μαθημάτων">
+    {prev ? <a class="prev" href={lessonUrl(prev.data.slug)}>← Προηγούμενο μάθημα</a> : <span></span>}
+    {next && <a class="next" href={lessonUrl(next.data.slug)}>{d.next_label ?? 'Επόμενο μάθημα →'}</a>}
+  </nav>
+</AdultLayout>

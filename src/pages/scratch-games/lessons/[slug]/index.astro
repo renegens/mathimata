@@ -1,0 +1,38 @@
+---
+import { render } from 'astro:content';
+import ScratchLayout from '../../../../layouts/ScratchLayout.astro';
+import { scratchLessons } from '../../../../lib/content';
+import { url } from '../../../../lib/url';
+export async function getStaticPaths() {
+  return (await scratchLessons()).map((entry) => ({ params: { slug: entry.data.slug }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const nn = (n: number) => String(n).padStart(2, '0');
+---
+<ScratchLayout title={d.html_title} description={d.goal}>
+  <a class="back" href={url('/scratch-games/lessons/')}>← Όλα τα μαθήματα Scratch</a>
+  <header class="hero">
+    <p class="eyebrow">ΜΑΘΗΜΑ {nn(d.number)} · {d.minutes} ΛΕΠΤΑ</p>
+    <h1>{d.title}</h1>
+    <p class="concept"><strong>{d.concept}</strong></p>
+    <p class="lede">{d.goal}</p>
+  </header>
+  <section class="start-panel">
+    <h2>Ξεκίνα εδώ</h2>
+    <p>{d.start}</p>
+    <div class="bar">
+      <a class="button big" href={url(d.starter)} download>Αρχείο αρχής .sb3</a>
+      <a class="button big accent2" href={url(d.complete)} download>Ολοκληρωμένη λύση .sb3</a>
+    </div>
+    <p class="links">
+      <a href={url(d.assets_zip)} download>Ξεχωριστά γραφικά SVG</a>
+      <span aria-hidden="true">·</span>
+      <a href={url(d.teacher_page)}>Σημειώσεις εκπαιδευτή</a>
+    </p>
+  </section>
+  <div class="prose"><Content /></div>
+  <p><a href={d.reference.url} target="_blank" rel="noopener">{d.reference.label}</a></p>
+  <p class="footnote">{d.footnote}</p>
+</ScratchLayout>

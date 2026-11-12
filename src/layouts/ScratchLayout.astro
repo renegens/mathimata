@@ -1,0 +1,12 @@
+---
+import Base from './Base.astro';
+import '../styles/scratch.css';
+interface Props { title: string; description?: string; teacher?: boolean }
+const { title, description, teacher = false } = Astro.props;
+---
+<Base title={title} description={description} theme="scratch" bodyClass={teacher ? 'is-teacher' : ''}>
+  <main id="main" class="page"><slot /></main>
+  <script is:inline>
+    document.querySelectorAll('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });
+  </script>
+</Base>

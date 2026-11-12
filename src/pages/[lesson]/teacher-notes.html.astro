@@ -1,0 +1,31 @@
+---
+import AdultLayout from '../../layouts/AdultLayout.astro';
+import { adultLessons } from '../../lib/content';
+import { renderMarkdown } from '../../lib/markdown';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const lessons = await adultLessons();
+  return lessons.map((entry) => ({ params: { lesson: entry.data.slug }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const d = entry.data;
+let html = await renderMarkdown(d.teacher, 'adults');
+if (!html.includes('<section')) html = `<section class="card">${html}</section>`;
+---
+<AdultLayout title={`Για εκπαιδευτές · ${d.title}`} description={d.teacher_goal} current={d.slug} teacher>
+  <nav class="tabs" aria-label="Υλικό μαθήματος">
+    <a href={url(`/${d.slug}/`)}>Για μαθητές</a>
+    <strong aria-current="page">Για εκπαιδευτές</strong>
+    <a href={url('/adults/')}>Μαθήματα ενηλίκων</a>
+    <a href={url('/adults/teacher-guide.html')}>Οδηγός 20 ωρών</a>
+  </nav>
+  <header class="lesson-head">
+    <p class="teacher-badge">Για εκπαιδευτές</p>
+    <p class="eyebrow">{d.teacher_tag}</p>
+    <h1>{d.teacher_title}</h1>
+    <p class="goal">{d.teacher_goal}</p>
+    <div class="head-actions"><button class="btn" type="button" data-print>Εκτύπωση σημειώσεων</button></div>
+  </header>
+  <div class="prose" set:html={html} />
+</AdultLayout>

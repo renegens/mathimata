@@ -1,0 +1,41 @@
+---
+import '../styles/base.css';
+import SiteBar from '../components/SiteBar.astro';
+import { url } from '../lib/url';
+
+interface Props {
+  title: string;
+  description?: string;
+  theme: 'home' | 'adults' | 'scratch' | 'microbit';
+  bodyClass?: string;
+  scripts?: string[];
+  footer?: boolean;
+}
+const { title, description, theme, bodyClass = '', scripts = [], footer = true } = Astro.props;
+const icon =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='${
+      { home: '#1d6a60', adults: '#0b5f8a', scratch: '#ff8a1f', microbit: '#b3122c' }[theme]
+    }'/><circle cx='11' cy='12' r='3' fill='#fff'/><circle cx='21' cy='12' r='3' fill='#fff'/><path d='M9 20q7 7 14 0' stroke='#fff' stroke-width='3' fill='none' stroke-linecap='round'/></svg>`,
+  );
+---
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" href={icon} />
+    <title>{title}</title>
+    <slot name="head" />
+  </head>
+  <body class={`theme-${theme} ${bodyClass}`.trim()} data-theme={theme}>
+    <a class="skip" href="#main">Μετάβαση στο περιεχόμενο</a>
+    <SiteBar theme={theme} />
+    <slot />
+    {footer && <footer class="site">Εκπαιδευτικό υλικό για εκπαιδευτές και μαθητές. Λειτουργεί και χωρίς σύνδεση στο διαδίκτυο.</footer>}
+    {scripts.map((s) => <script is:inline defer src={url(s)}></script>)}
+  </body>
+</html>

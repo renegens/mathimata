@@ -1,0 +1,127 @@
+/* Shared design system. Themes (home / adults / scratch / microbit) only override the tokens below
+   and add a few flourishes in their own files. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 5rem; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--base-size, 18px);
+  line-height: var(--leading, 1.65);
+  overflow-wrap: break-word;
+}
+img, svg, video { max-width: 100%; height: auto; }
+[hidden] { display: none !important; }
+
+h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.25; margin: 0 0 .5em; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 5.5vw, 3rem); font-weight: var(--head-weight, 700); letter-spacing: var(--head-tracking, 0); }
+h2 { font-size: clamp(1.4rem, 3.4vw, 1.8rem); font-weight: var(--head-weight, 700); margin-top: 0; }
+h3 { font-size: 1.25rem; font-weight: var(--head-weight, 700); }
+p { margin: 0 0 1em; }
+a { color: var(--link); text-underline-offset: .2em; text-decoration-thickness: .08em; }
+a:hover { text-decoration-thickness: .16em; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+.skip { position: absolute; left: .5rem; top: -4rem; z-index: 100; background: var(--accent); color: var(--on-accent); padding: .6rem 1rem; border-radius: 8px; }
+.skip:focus { top: .5rem; }
+
+/* ---------- site bar ---------- */
+.sitebar { background: var(--bar-bg, var(--surface)); border-bottom: 1px solid var(--border); }
+.sitebar-in { max-width: var(--wide, 1180px); margin: auto; padding: .55rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.25rem; }
+.sitebar .brand { font-family: var(--font-head); font-weight: 700; color: var(--text); text-decoration: none; font-size: 1rem; margin-right: auto; }
+.sitebar ul { list-style: none; display: flex; flex-wrap: wrap; gap: .1rem .35rem; margin: 0; padding: 0; }
+.sitebar a:not(.brand) { display: inline-block; padding: .35rem .7rem; border-radius: 999px; font-size: .9rem; font-weight: 600; text-decoration: none; color: var(--text); }
+.sitebar a:not(.brand):hover { background: var(--surface-2); }
+.sitebar a[aria-current] { background: var(--accent); color: var(--on-accent); }
+
+/* ---------- layout ---------- */
+.wrap { max-width: var(--wide, 1180px); margin: 0 auto; padding: 0 1rem; }
+main { display: block; }
+.page { max-width: var(--measure, 960px); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+.eyebrow, .tag { display: inline-block; font-size: .8rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--eyebrow, var(--accent-text, var(--accent))); margin: 0 0 .6rem; font-family: var(--font-eyebrow, var(--font-body)); }
+.lede { font-size: 1.2em; color: var(--muted); max-width: 46rem; }
+.muted { color: var(--muted); }
+.back { display: inline-block; margin-bottom: 1rem; font-weight: 600; }
+
+/* ---------- buttons ---------- */
+.button, button.btn, .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font: inherit; font-weight: 700; line-height: 1.2; text-align: center;
+  min-height: 2.9rem; padding: .65rem 1.2rem; border-radius: var(--btn-radius, 10px);
+  border: 2px solid var(--accent); background: var(--accent); color: var(--on-accent);
+  text-decoration: none; cursor: pointer;
+}
+.button:hover, .btn:hover { background: var(--accent-hover, var(--accent)); filter: brightness(1.08); }
+.button.secondary, .btn.secondary { background: transparent; color: var(--accent-text, var(--accent)); }
+.button.secondary:hover, .btn.secondary:hover { background: var(--surface-2); filter: none; }
+.bar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 1rem 0; }
+
+/* ---------- cards / grids ---------- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius, 16px); padding: clamp(1rem, 3vw, 1.7rem); margin: 0 0 1.25rem; }
+.card > :last-child { margin-bottom: 0; }
+.grid { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.grid > .card { margin: 0; }
+a.card { display: block; color: inherit; text-decoration: none; }
+a.card:hover { border-color: var(--accent); }
+
+/* ---------- prose (Markdown bodies) ---------- */
+.prose ul, .prose ol { padding-left: 1.5rem; margin: 0 0 1em; }
+.prose li { margin: .45rem 0; }
+.prose li > p { margin: 0; }
+.prose ul.checks { list-style: none; padding-left: 0; }
+.prose hr { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+.prose code { font-family: var(--font-mono, ui-monospace, monospace); font-size: .9em; background: var(--surface-2); padding: .1em .35em; border-radius: 6px; overflow-wrap: anywhere; }
+.prose pre { overflow-x: auto; background: var(--surface-2); padding: 1rem; border-radius: 12px; font-family: var(--font-mono, ui-monospace, monospace); line-height: 1.5; }
+.prose pre code { background: none; padding: 0; }
+.prose blockquote, .help { margin: 1rem 0; padding: .6rem 1rem; border-left: 5px solid var(--note, var(--accent)); background: var(--note-bg, var(--surface-2)); border-radius: 0 10px 10px 0; }
+.prose blockquote > :last-child, .help:last-child { margin-bottom: 0; }
+kbd { font: inherit; font-weight: 600; font-size: .92em; background: var(--surface-2); border: 1px solid var(--border-strong, var(--border)); border-bottom-width: 3px; border-radius: 6px; padding: 0 .45em; white-space: nowrap; }
+.table-wrap { overflow-x: auto; margin: 0 0 1.2rem; max-width: 100%; }
+.prose table { border-collapse: collapse; width: 100%; font-size: .95em; }
+.prose th, .prose td { text-align: left; vertical-align: top; padding: .6rem .7rem; border-bottom: 1px solid var(--border); }
+.prose th { background: var(--surface-2); font-weight: 700; }
+details { background: var(--surface-2); border-radius: 12px; padding: .8rem 1rem; margin: 1rem 0; }
+summary { cursor: pointer; font-weight: 700; }
+.status { font-weight: 700; white-space: pre-line; }
+
+/* checkboxes (adult steps, course checklists) */
+label.done, label.task { display: flex; align-items: center; gap: .75rem; font-weight: 600; margin: .8rem 0 0; padding: .55rem .8rem; border-radius: 10px; background: var(--surface-2); cursor: pointer; }
+.task-item { list-style: none; }
+input[type=checkbox] { width: 1.5rem; height: 1.5rem; flex: none; accent-color: var(--accent); margin: 0; }
+
+/* forms (adult exercises) */
+.exercise label:not(.done) { display: block; font-weight: 700; margin: 1rem 0 .3rem; }
+input, select, textarea { font: inherit; width: 100%; padding: .65rem .8rem; border: 2px solid var(--border-strong, var(--border)); border-radius: 10px; background: var(--field-bg, var(--surface)); color: var(--text); }
+input[type=checkbox] { width: 1.5rem; height: 1.5rem; padding: 0; }
+input[type=file] { max-width: 100%; font-size: .95rem; }
+textarea { min-height: 9rem; }
+.exercise button, .prose button, .exercise .button { font: inherit; font-weight: 700; min-height: 2.9rem; padding: .6rem 1.2rem; margin-top: .6rem; border-radius: var(--btn-radius, 10px); border: 2px solid var(--accent); background: var(--accent); color: var(--on-accent); cursor: pointer; }
+.exercise button.secondary { background: transparent; color: var(--accent-text, var(--accent)); }
+.exercise td input { min-width: 4.5rem; }
+.exercise table { width: 100%; border-collapse: collapse; }
+.exercise caption { font-weight: 700; text-align: left; margin-bottom: .6rem; }
+.exercise th, .exercise td { padding: .5rem .4rem; text-align: left; border-bottom: 1px solid var(--border); }
+
+/* pager */
+.pager { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; margin: 2rem 0 0; }
+.pager a { flex: 1 1 14rem; padding: .9rem 1.1rem; border: 2px solid var(--border-strong, var(--border)); background: var(--surface); border-radius: var(--radius, 14px); font-weight: 700; text-decoration: none; color: var(--text); }
+.pager a:hover { border-color: var(--accent); }
+.pager a.next { text-align: right; }
+
+footer.site { color: var(--muted); font-size: .9rem; padding: 1.5rem 1rem 3rem; max-width: var(--wide, 1180px); margin: 0 auto; }
+
+/* ---------- print ---------- */
+@media print {
+  :root { --bg: #fff !important; --surface: #fff !important; --surface-2: #fff !important; --text: #000 !important; --muted: #222 !important; --border: #999 !important; }
+  body { font-size: 12pt; background: #fff; color: #000; }
+  .sitebar, .skip, .no-print, .exercise, nav, .pager, button, .button, .btn, .lesson-list, footer.site, .screen { display: none !important; }
+  .page { max-width: none; padding: 0; }
+  .card { break-inside: avoid; border-radius: 0; padding: .5rem; margin: .5rem 0; border-color: #999; }
+  a { color: #000; text-decoration: none; }
+  details { display: block; }
+  details > * { display: block; }
+}
+@media (max-width: 520px) {
+  .sitebar .brand { flex-basis: 100%; }
+  .bar > .button, .bar > .btn { flex: 1 1 100%; }
+}

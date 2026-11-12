@@ -1,0 +1,30 @@
+{
+  "name": "mathimata-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check:types": "astro check",
+    "check:content": "python3 scripts/check_adults.py && python3 scripts/check_scratch.py",
+    "check:site": "python3 scripts/check_site.py dist --base / && python3 scripts/check_site.py dist-mathimata --base /mathimata/",
+    "check": "npm run check:types && npm run check:content && npm run build && npm run build:pages && npm run check:site",
+    "build:pages": "SITE_BASE=/mathimata/ astro build --outDir dist-mathimata"
+  },
+  "dependencies": {
+    "@astrojs/check": "0.9.12",
+    "@astrojs/markdown-remark": "6.3.11",
+    "@fontsource-variable/comfortaa": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource-variable/noto-sans": "5.3.0",
+    "astro": "5.18.2",
+    "hast-util-from-html": "2.1.0",
+    "typescript": "5.9.3",
+    "unist-util-visit": "5.2.0"
+  }
+}

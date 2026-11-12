@@ -1,0 +1,23 @@
+---
+import Base from './Base.astro';
+import '../styles/adults.css';
+import LessonList from '../components/LessonList.astro';
+
+interface Props { title: string; description?: string; teacher?: boolean; current?: string; aside?: boolean }
+const { title, description, teacher = false, current, aside = true } = Astro.props;
+---
+<Base title={title} description={description} theme="adults" bodyClass={teacher ? 'teacher-page' : ''} scripts={['/adult-materials/lessons.js']}>
+  <div class={`adult-shell ${aside ? '' : 'no-aside'}`}>
+    {aside && <LessonList current={current} teacher={teacher} />}
+    <main id="main">
+      <slot />
+    </main>
+  </div>
+  <script is:inline>
+    // On wide screens the lesson list is always open; on phones it starts collapsed.
+    (function () {
+      var d = document.querySelector('details.lesson-list');
+      if (d && window.matchMedia('(min-width: 1100px)').matches) d.open = true;
+    })();
+  </script>
+</Base>

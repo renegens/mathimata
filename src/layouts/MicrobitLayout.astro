@@ -1,0 +1,10 @@
+---
+import Base from './Base.astro';
+import '../styles/scratch.css';
+import '../styles/microbit.css';
+interface Props { title: string; description?: string; teacher?: boolean; scripts?: string[] }
+const { title, description, teacher = false, scripts = [] } = Astro.props;
+---
+<Base title={title} description={description} theme="microbit" bodyClass={teacher ? 'is-teacher' : ''} scripts={scripts}>
+  <main id="main" class="page"><slot /></main>
+</Base>

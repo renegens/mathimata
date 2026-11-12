@@ -1,0 +1,37 @@
+---
+import { getEntry, getCollection, render } from 'astro:content';
+import ScratchLayout from '../../layouts/ScratchLayout.astro';
+import GameCard from '../../components/GameCard.astro';
+import { url } from '../../lib/url';
+const page = (await getEntry('scratch-pages', 'games-index'))!;
+const d = page.data;
+const games = (await getCollection('scratch-games')).sort((a, b) => a.data.number - b.data.number);
+const { Content } = await render(page);
+const nn = (n: number) => String(n).padStart(2, '0');
+---
+<ScratchLayout title={d.html_title} description={d.lede}>
+  <a class="back" href={url(d.back.href)}>{d.back.label}</a>
+  <header class="hero">
+    <p class="eyebrow">{d.tag}</p>
+    <h1>{d.title}</h1>
+    <p class="lede">{d.lede}</p>
+    <div class="bar"><a class="button big accent2" href={url(d.download_all.href)} download>{d.download_all.label}</a></div>
+  </header>
+  <div class="promos">
+    {d.promos?.map((p) => (
+      <section class="promo">
+        <h2>{p.heading}</h2>
+        <p>{p.text}</p>
+        <a class="button" href={url(p.cta_href)}>{p.cta_label}</a>
+      </section>
+    ))}
+  </div>
+  <h2 class="section-title">Τρία παιχνίδια</h2>
+  <div class="grid cards">
+    {games.map((g) => (
+      <GameCard number={`ΠΑΙΧΝΙΔΙ ${nn(g.data.number)}`} title={g.data.title} description={g.data.description} image={g.data.icon} imageClass="icon"
+        downloads={[{ label: 'Λήψη παιχνιδιού .sb3', href: g.data.sb3 }, { label: 'Λήψη γραφικών αντικειμένων', href: g.data.assets_zip, secondary: true }]} />
+    ))}
+  </div>
+  <section class="panel prose"><Content /></section>
+</ScratchLayout>

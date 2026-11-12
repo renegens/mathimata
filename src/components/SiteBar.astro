@@ -1,0 +1,19 @@
+---
+import { url } from '../lib/url';
+const { theme } = Astro.props;
+const items = [
+  { id: 'adults', label: 'Μαθήματα ενηλίκων', href: '/adults/' },
+  { id: 'scratch', label: 'Παιχνίδια Scratch', href: '/scratch-games/' },
+  { id: 'microbit', label: 'micro:bit', href: '/microbit-emojis/' },
+];
+---
+<header class="sitebar no-print">
+  <div class="sitebar-in">
+    <a class="brand" href={url('/')}>Βιβλιοθήκη μαθημάτων</a>
+    <nav aria-label="Ενότητες">
+      <ul>
+        {items.map((i) => <li><a href={url(i.href)} aria-current={i.id === theme ? 'true' : undefined}>{i.label}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+</header>
