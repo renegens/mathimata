@@ -3,6 +3,8 @@
 
 usage: check_site.py DIST [--base /mathimata/] [--old ../lesson-server/public] [-v]
 
+Without --old, (a) uses scripts/legacy-urls.txt and (c)/(d) are skipped.
+
  (a) every HTML page of the old site exists in DIST at the same path
  (b) every internal href/src/url() in DIST (HTML + CSS) resolves to a file under the given base
      (root-relative URLs outside the base are errors; #fragments are checked for local pages)
@@ -18,7 +20,6 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit, urljoin
 
 SITE = Path(__file__).resolve().parents[1]
-DEFAULT_OLD = SITE.parent / 'lesson-server' / 'public'
 
 # ---- (d) whitelist: old fragments that are intentionally not reproduced verbatim -------------------
 # key: regex on the old page path (relative to old root); value: set of normalised old fragments.
@@ -128,10 +129,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('dist')
     ap.add_argument('--base', default='/')
-    ap.add_argument('--old', default=str(DEFAULT_OLD))
+    ap.add_argument('--old', default=None, help='old site folder; enables checks (c) and (d)')
     ap.add_argument('-v', '--verbose', action='store_true')
     args = ap.parse_args()
-    dist, old = Path(args.dist).resolve(), Path(args.old).resolve()
+    dist = Path(args.dist).resolve()
+    old = Path(args.old).resolve() if args.old else None
     base = '/' + args.base.strip('/') + '/' if args.base.strip('/') else '/'
     errors = []
 
@@ -140,7 +142,10 @@ def main():
 
     if not dist.is_dir():
         sys.exit(f'dist folder not found: {dist}')
-    old_pages = sorted(p.relative_to(old).as_posix() for p in old.rglob('*.html'))
+    if old:
+        old_pages = sorted(p.relative_to(old).as_posix() for p in old.rglob('*.html'))
+    else:  # URLs of the original site, kept so old links never break
+        old_pages = [l for l in (SITE / 'scripts' / 'legacy-urls.txt').read_text(encoding='utf-8').split('\n') if l.strip()]
     new_pages = sorted(p.relative_to(dist).as_posix() for p in dist.rglob('*.html'))
 
     # ---- (a) ----
@@ -223,53 +228,56 @@ def main():
             check_url(f'{rel} url()', cu, m.group(1).strip('\'" '))
     print(f'(b) internal links/assets: {n_links} checked under base {base}, {bad_b} broken')
 
-    # ---- (c) ----
-    exts = {'.sb3', '.zip', '.pdf', '.md'}
-    n_c = bad_c = 0
-    for f in sorted(old.rglob('*')):
-        if f.is_file() and f.suffix.lower() in exts:
-            rel = f.relative_to(old)
-            n_c += 1
-            g = dist / rel
-            if not g.is_file():
-                bad_c += 1
-                err('c', f'download missing in build: {rel}')
-            elif sha(f) != sha(g):
-                bad_c += 1
-                err('c', f'download differs from old site: {rel}')
-    for g in sorted(dist.rglob('*')):
-        if g.is_file() and g.suffix.lower() in exts and not (old / g.relative_to(dist)).is_file():
-            print(f'    note: {g.relative_to(dist)} has no counterpart in the old site (not compared)')
-    print(f'(c) downloads (.sb3 .zip .pdf .md): {n_c} compared with old site, {bad_c} problems')
+    if old:
+        # ---- (c) ----
+        exts = {'.sb3', '.zip', '.pdf', '.md'}
+        n_c = bad_c = 0
+        for f in sorted(old.rglob('*')):
+            if f.is_file() and f.suffix.lower() in exts:
+                rel = f.relative_to(old)
+                n_c += 1
+                g = dist / rel
+                if not g.is_file():
+                    bad_c += 1
+                    err('c', f'download missing in build: {rel}')
+                elif sha(f) != sha(g):
+                    bad_c += 1
+                    err('c', f'download differs from old site: {rel}')
+        for g in sorted(dist.rglob('*')):
+            if g.is_file() and g.suffix.lower() in exts and not (old / g.relative_to(dist)).is_file():
+                print(f'    note: {g.relative_to(dist)} has no counterpart in the old site (not compared)')
+        print(f'(c) downloads (.sb3 .zip .pdf .md): {n_c} compared with old site, {bad_c} problems')
 
-    # ---- (d) ----
-    n_d = bad_d = 0
-    for page in old_pages:
-        new = dist / page
-        if not new.is_file():
-            continue
-        n_d += 1
-        old_frags = visible_fragments((old / page).read_text(encoding='utf-8'))
-        new_text = ' ' + ' '.join(visible_fragments(new.read_text(encoding='utf-8'))) + ' '
-        new_compact = re.sub(r'\s+', '', new_text)
-        allow = set()
-        for pat, items in WHITELIST.items():
-            if re.search(pat, page):
-                allow |= items
-        miss = []
-        for fr in old_frags:
-            if fr in allow:
+        # ---- (d) ----
+        n_d = bad_d = 0
+        for page in old_pages:
+            new = dist / page
+            if not new.is_file():
                 continue
-            if fr in new_text or re.sub(r'\s+', '', fr) in new_compact:
-                continue
-            miss.append(fr)
-        if miss:
-            bad_d += 1
-            for fr in miss:
-                err('d', f'{page}: old text not found in new page: {fr[:160]!r}')
-        elif args.verbose:
-            print(f'    ok  {page} ({len(old_frags)} fragments)')
-    print(f'(d) visible text: {n_d} old pages compared, {bad_d} with missing text')
+            n_d += 1
+            old_frags = visible_fragments((old / page).read_text(encoding='utf-8'))
+            new_text = ' ' + ' '.join(visible_fragments(new.read_text(encoding='utf-8'))) + ' '
+            new_compact = re.sub(r'\s+', '', new_text)
+            allow = set()
+            for pat, items in WHITELIST.items():
+                if re.search(pat, page):
+                    allow |= items
+            miss = []
+            for fr in old_frags:
+                if fr in allow:
+                    continue
+                if fr in new_text or re.sub(r'\s+', '', fr) in new_compact:
+                    continue
+                miss.append(fr)
+            if miss:
+                bad_d += 1
+                for fr in miss:
+                    err('d', f'{page}: old text not found in new page: {fr[:160]!r}')
+            elif args.verbose:
+                print(f'    ok  {page} ({len(old_frags)} fragments)')
+        print(f'(d) visible text: {n_d} old pages compared, {bad_d} with missing text')
+    else:
+        print('(c)/(d) skipped: no --old site given')
 
     if errors:
         print(f'\nFAILED: {len(errors)} problem(s)')

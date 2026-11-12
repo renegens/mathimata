@@ -133,7 +133,7 @@ if (stockForm) stockForm.addEventListener('submit', event => {
   status.textContent = 'Συνολικό κόστος: ' + new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR'}).format(total);
 });
 
-/* --- added by site/scripts/convert_adults.py: lesson 1 "Ξεκινώ ξανά" button (was an inline script) --- */
+/* --- lesson 1 "Ξεκινώ ξανά" button (was an inline script) --- */
 const resetButton = document.getElementById('reset');
 if (resetButton) resetButton.addEventListener('click', () => {
   steps.forEach(x => { x.checked = false; });

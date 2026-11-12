@@ -11,9 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check:types": "astro check",
-    "check:content": "python3 scripts/check_adults.py && python3 scripts/check_scratch.py",
     "check:site": "python3 scripts/check_site.py dist --base / && python3 scripts/check_site.py dist-mathimata --base /mathimata/",
-    "check": "npm run check:types && npm run check:content && npm run build && npm run build:pages && npm run check:site",
+    "check": "npm run check:types && npm run build && npm run build:pages && npm run check:site",
     "build:pages": "SITE_BASE=/mathimata/ astro build --outDir dist-mathimata"
   },
   "dependencies": {

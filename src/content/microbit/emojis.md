@@ -12,7 +12,7 @@ scripts: ["/microbit-emojis/lesson.js"]
 stylesheets: ["/microbit-emojis/lesson.css"]
 downloads: [{"label": "JavaScript", "href": "/microbit-emojis/emojis.js"}]
 teacher_page: "/microbit-emojis/teacher-notes.html"
-designer: "Raw HTML block in the body: <div class=\"designer\"> (needs scripts[] loaded, see CONTENT.md)"
+designer: "Raw HTML block in the body: <div class=\"designer\"> (needs scripts[] loaded, see AGENTS.md)"
 ---
 
 <section>
