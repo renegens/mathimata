@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check a built site folder.
 
-usage: check_site.py DIST [--base /mathimata/] [--old ../lesson-server/public] [-v]
+usage: check_site.py DIST [--base /mathimata/] [--old OLD_SITE_DIR] [-v]
 
 Without --old, (a) uses scripts/legacy-urls.txt and (c)/(d) are skipped.
 

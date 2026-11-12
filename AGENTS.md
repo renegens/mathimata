@@ -2,20 +2,28 @@
 
 Greek lesson website: adult computer lessons, Scratch (games, lessons, a course for ages 7–9) and micro:bit. Every lesson is a Markdown file; Astro builds static pages with one theme per category.
 
-- Live site: https://renegens.github.io/mathimata/ (GitHub Pages; repo `renegens/mathimata`, branch `main`)
-- The same build can also be served at `/` by the classroom server (`../lesson-server/`, LAN only).
+- **Live site:** https://renegens.github.io/mathimata/ (GitHub Pages)
+- **Repo:** `renegens/mathimata` (public), branch `main`. **This repo is the only copy of the site.** There is no local server or local source folder any more; clone this repo to work on it.
+
+## History (why things are the way they are)
+
+- The lessons started on a LAN classroom server: a Python static server on port 8765, behind a port-80 systemd socket proxy and firewall rules allowing only the home network. Its pages came from several Python generator scripts.
+- In November 2026 the content was converted to Markdown (each converter was checked against the old pages for text and file fidelity) and rebuilt as this Astro site. The redesigned home page has an interactive micro:bit face.
+- On 2026-11-12 the classroom server was stopped and fully removed (services disabled, firewall rules deleted). The local working folders, conversion scripts and old generators were moved to the system trash. They are not needed: this repo contains everything the site uses.
+- Kept outside the site, never to be published: student lists and contacts. A Python course and a micro:bit sound project were never part of the site and were not carried over.
 
 ## Ground rules
 
-- **The Markdown in `src/content/` is the master copy.** Edit lessons there. The old Python generators in `../lesson-server/tools/` and the one-off conversion scripts (archived in `../site-archive/`) must not be re-run against this site.
+- **The Markdown in `src/content/` is the master copy.** Edit lessons there. Never regenerate content from the old HTML site; it no longer exists.
 - **All visible text is Greek**, short and direct. Product names, file extensions and Scratch tokens may stay as they are. Don't rewrite existing lesson wording unless asked.
-- **Never delete files.** Move anything no longer needed to `../site-archive/<same path>` instead.
+- **Never delete files with `rm`.** If a file must leave the repo, ask first, then move it with `git mv` to an `archive/` folder or into the system trash (`gio trash`). Git history keeps the old version either way.
+- **The repo is public:** everything committed is visible to anyone, including teacher notes and Git history. Never commit student names, contact details, credentials or local machine details (paths, IP addresses).
 - **URLs are stable.** Students have bookmarks and printed links. Don't rename slugs or `.html` pages. `scripts/legacy-urls.txt` lists every original URL, and the site check fails if one disappears.
 - **Links:** write internal links site-absolute (`/scratch-games/...`) or relative. Never hard-code `/mathimata/`; the base path is added at build time.
-- **Teacher material is public on purpose**, but it must be clearly labelled («Για εκπαιδευτές» / «Σημειώσεις εκπαιδευτή»). Never add private data (student names, contacts) anywhere in this repo.
+- **Teacher material is public on purpose**, but it must be clearly labelled («Για εκπαιδευτές» / «Σημειώσεις εκπαιδευτή»).
 - **Third-party files keep their credit:** the course example games are by Jesse Smith (BSD 3-Clause, `public/scratch-games/course/games/LICENSE.txt`), and the course starters come from the Scratch Team (scratch.mit.edu).
-- **The site must work offline on a LAN.** No CDN or external font/script requests; fonts come from `@fontsource` packages. Links to scratch.mit.edu etc. in lesson text are fine.
-- Don't commit or push unless asked.
+- **The site is self-contained.** No CDN, analytics, or external font or script requests; fonts come from `@fontsource` packages. This keeps students' visits private and lets the built `dist/` run from any plain static server (e.g. a classroom laptop) without internet. Links to scratch.mit.edu and similar sites in lesson text are fine.
+- **Don't commit or push unless asked.** A push to `main` publishes to the live site within about a minute.
 
 ## Layout
 
@@ -93,8 +101,31 @@ npm run check          # astro check + both builds + scripts/check_site.py on ea
 - every URL in `legacy-urls.txt` exists
 - every internal link, asset and CSS `url()` resolves under the base
 
-With `--old ../lesson-server/public` it also compares downloads byte for byte and checks page text against the old site.
+Its `--old DIR` option compared the build with the retired classroom site during the migration; that folder no longer exists, so leave the option unused.
+
+For visual checks, take headless screenshots of `npm run preview` at 390px and 1280px wide, in both light and dark mode:
+
+```sh
+chromium --headless --screenshot=out.png --window-size=390,3000 http://127.0.0.1:4321/
+chromium --headless --screenshot=out-dark.png --window-size=1280,1500 --blink-settings=preferredColorScheme=0 http://127.0.0.1:4321/
+```
+
+## Workflow: making a change
+
+```sh
+git clone https://github.com/renegens/mathimata.git && cd mathimata
+npm ci
+npm run dev                      # edit src/content/*.md, watch http://localhost:4321/
+npm run check                    # must pass before committing
+git add -A && git commit -m "…" && git push   # only when the user asks
+```
 
 ## Deploy
 
-A push to `main` runs `.github/workflows/pages.yml`, which runs `npm ci` and builds with `SITE_BASE=/mathimata/`, then deploys to GitHub Pages. Run `npm run check` before pushing.
+- A push to `main` (or a manual run) triggers `.github/workflows/pages.yml`. It runs `npm ci`, then `npm run build` with `SITE_BASE=/mathimata/`, then deploys to GitHub Pages.
+- The workflow's GitHub Actions run on Node 24 (`checkout@v7`, `setup-node@v7`, `upload-pages-artifact@v5`, `deploy-pages@v5`). The site itself builds with Node 22. When GitHub warns about deprecated runtimes, bump the action majors.
+- Pages is configured with `build_type=workflow`; the `gh-pages` branch isn't used.
+- **Verify a deploy:**
+  - Watch the run: `gh run watch <id> -R renegens/mathimata --exit-status` (get the id from `gh run list -R renegens/mathimata -L 1`).
+  - Check that every legacy URL answers 200 on the live site: loop over `scripts/legacy-urls.txt`, URL-encode each path and drop a trailing `index.html` before requesting it.
+  - Only one deploy runs at a time; a newer run cancels an older one, so a "cancelled" run is normal.
